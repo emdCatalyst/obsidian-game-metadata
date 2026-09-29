@@ -1,0 +1,14 @@
+# Source files
+src/
+tsconfig.json
+esbuild.config.mjs
+
+# Documentation & repository assets
+assets/
+docs/
+.github/
+
+# Git & Config
+.gitignore
+.npmignore
+.git/

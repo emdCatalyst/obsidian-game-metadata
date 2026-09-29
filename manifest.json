@@ -1,0 +1,10 @@
+{
+  "id": "obsidian-game-metadata",
+  "name": "Game and Visual Novel Metadata",
+  "version": "1.0.0",
+  "minAppVersion": "1.4.0",
+  "description": "Fetch video game and visual novel metadata, artwork, and personal stats into Obsidian notes with Banner and Dataview integration.",
+  "author": "emdCatalyst",
+  "authorUrl": "https://github.com/emdCatalyst",
+  "isDesktopOnly": false
+}

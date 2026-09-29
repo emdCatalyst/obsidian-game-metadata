@@ -1,0 +1,31 @@
+{
+  "name": "obsidian-game-metadata",
+  "version": "1.0.0",
+  "description": "Fetch video game and visual novel metadata, artwork, and ratings into Obsidian notes with Banner and Dataview integration.",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "node esbuild.config.mjs production"
+  },
+  "keywords": [
+    "obsidian",
+    "obsidian-plugin",
+    "gaming",
+    "game-metadata",
+    "rawg",
+    "dataview",
+    "vn",
+    "visual novel",
+    "banner"
+  ],
+  "author": "emdCatalyst",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "builtin-modules": "^3.3.0",
+    "esbuild": "0.20.0",
+    "obsidian": "latest",
+    "tslib": "2.6.2",
+    "typescript": "^5.3.3"
+  }
+}

@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Build and temporary files
+main.js
+dist/
+*.log
+npm-debug.log*
+
+# Vault local testing data
+data.json
+.obsidian/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# IDE / Editor configuration
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment variables
+.env
+.env.local

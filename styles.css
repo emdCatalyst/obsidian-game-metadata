@@ -1,0 +1,140 @@
+/* Obsidian Game Metadata Plugin Styles */
+
+.game-metadata-suggest-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  transition: background-color 0.15s ease;
+}
+
+.game-metadata-thumbnail-container {
+  width: 50px;
+  height: 65px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: var(--background-secondary-alt);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-metadata-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.game-metadata-thumbnail-placeholder {
+  font-size: 20px;
+  opacity: 0.5;
+}
+
+.game-metadata-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.game-metadata-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.game-metadata-title {
+  font-weight: 600;
+  font-size: 0.95em;
+  color: var(--text-normal);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.game-metadata-year {
+  font-size: 0.8em;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.game-metadata-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75em;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+}
+
+.game-metadata-badge {
+  padding: 1px 6px;
+  border-radius: 4px;
+  background-color: var(--background-modifier-box-shadow);
+  border: 1px solid var(--background-modifier-border);
+  font-size: 0.72em;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.game-metadata-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-weight: 600;
+  color: var(--text-accent);
+}
+
+.game-metadata-rating.metacritic {
+  background-color: #66cc33;
+  color: #000;
+  padding: 0 4px;
+  border-radius: 3px;
+  font-size: 0.7em;
+  font-weight: 700;
+}
+
+.game-metadata-genres {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+}
+
+/* Loading & Empty State */
+.game-metadata-loading,
+.game-metadata-empty {
+  padding: 16px;
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Settings Tab Styling */
+.game-metadata-settings-section-header {
+  font-weight: 600;
+  font-size: 1.1em;
+  margin-top: 20px;
+  margin-bottom: 8px;
+  color: var(--text-accent);
+  border-bottom: 1px solid var(--background-modifier-border);
+  padding-bottom: 4px;
+}
+
+.game-metadata-settings-textarea {
+  width: 100%;
+  font-family: var(--font-monospace);
+  font-size: 0.85em;
+  min-height: 140px;
+}
+
+.game-metadata-helper-text {
+  font-size: 0.8em;
+  color: var(--text-muted);
+  margin-top: 4px;
+  margin-bottom: 12px;
+}
