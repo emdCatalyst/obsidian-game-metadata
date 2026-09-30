@@ -1,5 +1,5 @@
 {
-  "name": "obsidian-game-metadata",
+  "name": "game-metadata",
   "version": "1.0.0",
   "description": "Fetch video game and visual novel metadata, artwork, and ratings into Obsidian notes with Banner and Dataview integration.",
   "main": "main.js",
