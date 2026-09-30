@@ -114,8 +114,7 @@ export class GameSearchModal extends SuggestModal<GameMetadata> {
       const titleRow = infoContainer.createDiv({ cls: "game-metadata-title-row" });
       titleRow.createSpan({ text: game.title, cls: "game-metadata-title" });
 
-      const metaRow = infoContainer.createDiv({ cls: "game-metadata-helper-text" });
-      metaRow.style.margin = "0";
+      const metaRow = infoContainer.createDiv({ cls: "game-metadata-helper-text game-metadata-meta-desc" });
       metaRow.setText("Manually enter custom or unlisted game details");
       return;
     }
@@ -148,10 +147,7 @@ export class GameSearchModal extends SuggestModal<GameMetadata> {
     }
 
     if (game.originalTitle && game.originalTitle !== game.title) {
-      const origRow = infoContainer.createDiv({ cls: "game-metadata-helper-text" });
-      origRow.style.margin = "0";
-      origRow.style.fontSize = "0.75em";
-      origRow.style.opacity = "0.8";
+      const origRow = infoContainer.createDiv({ cls: "game-metadata-helper-text game-metadata-original-title" });
       origRow.setText(game.originalTitle);
     }
 

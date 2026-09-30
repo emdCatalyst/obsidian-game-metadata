@@ -1,4 +1,4 @@
-/* Obsidian Game Metadata Plugin Styles */
+/* Obsidian Game and Visual Novel Metadata Plugin Styles */
 
 .game-metadata-suggest-item {
   display: flex;
@@ -71,6 +71,16 @@
   flex-wrap: wrap;
 }
 
+.game-metadata-meta-desc {
+  margin: 0;
+}
+
+.game-metadata-original-title {
+  margin: 0;
+  font-size: 0.75em;
+  opacity: 0.8;
+}
+
 .game-metadata-badge {
   padding: 1px 6px;
   border-radius: 4px;
@@ -115,16 +125,6 @@
 }
 
 /* Settings Tab Styling */
-.game-metadata-settings-section-header {
-  font-weight: 600;
-  font-size: 1.1em;
-  margin-top: 20px;
-  margin-bottom: 8px;
-  color: var(--text-accent);
-  border-bottom: 1px solid var(--background-modifier-border);
-  padding-bottom: 4px;
-}
-
 .game-metadata-settings-textarea {
   width: 100%;
   font-family: var(--font-monospace);
@@ -137,4 +137,63 @@
   color: var(--text-muted);
   margin-top: 4px;
   margin-bottom: 12px;
+}
+
+/* Textarea & Inputs */
+.game-metadata-textarea-full {
+  width: 100%;
+}
+
+/* Duration Feedback Badge */
+.game-metadata-duration-badge {
+  font-size: 0.8em;
+  margin-left: 12px;
+  margin-top: -4px;
+  margin-bottom: 12px;
+}
+
+.game-metadata-duration-badge.mod-error {
+  color: var(--text-error);
+}
+
+.game-metadata-duration-badge.mod-accent {
+  color: var(--text-accent);
+}
+
+/* Edit Warning Box */
+.game-metadata-warning-box {
+  padding: 8px 12px;
+  margin-bottom: 14px;
+  border-radius: 4px;
+  border-left: 4px solid var(--text-warning, #d97706);
+  background-color: var(--background-secondary);
+  font-size: 0.85em;
+  line-height: 1.4;
+}
+
+.game-metadata-warning-box strong {
+  color: var(--text-warning, #d97706);
+}
+
+/* Quick Select Platform Pills */
+.game-metadata-pills-container {
+  font-size: 0.8em;
+  color: var(--text-muted);
+  margin-left: 12px;
+  margin-top: -6px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.game-metadata-pills-label {
+  align-self: center;
+  opacity: 0.8;
+}
+
+.game-metadata-pill-btn {
+  font-size: 0.8em;
+  padding: 2px 8px;
+  cursor: pointer;
 }

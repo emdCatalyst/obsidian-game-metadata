@@ -14,7 +14,7 @@ export class GameMetadataSettingTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
-    containerEl.createEl("h2", { text: "Game Metadata Plugin Settings" });
+    new Setting(containerEl).setName("Game Metadata Plugin Settings").setHeading();
 
     // -------------------------------------------------------------
     // Provider & API Keys
@@ -353,9 +353,6 @@ export class GameMetadataSettingTab extends PluginSettingTab {
   }
 
   private addSectionHeader(containerEl: HTMLElement, title: string) {
-    containerEl.createEl("div", {
-      text: title,
-      cls: "game-metadata-settings-section-header",
-    });
+    new Setting(containerEl).setName(title).setHeading();
   }
 }

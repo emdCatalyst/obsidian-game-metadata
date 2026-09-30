@@ -63,12 +63,12 @@
 - **Book Icon**: Search Visual Novel (VNDB)
 
 ### Command Palette
-1. **`Game Metadata: Search Video Game (RAWG / Steam)`**: Search and create a new video game note.
-2. **`Game Metadata: Search Visual Novel (VNDB)`**: Search and create a new visual novel note.
-3. **`Game Metadata: Refresh remote metadata for active note`**: Refreshes API data (artwork, description, HLTB hours, genres, developers) while preserving all personal stats and custom frontmatter keys.
-4. **`Game Metadata: Edit personal stats & review for active note`**: Open the personal stats modal to edit status, rating, dates, playtime, review, or custom links and re-render the note body from your active template.
-5. **`Game Metadata: Create custom Game note manually`**: Manual creator for unlisted or indie games.
-6. **`Game Metadata: Create custom Visual Novel note manually`**: Manual creator for unlisted or indie visual novels.
+1. **`Game and Visual Novel Metadata: Search Video Game (RAWG / Steam)`**: Search and create a new video game note.
+2. **`Game and Visual Novel Metadata: Search Visual Novel (VNDB)`**: Search and create a new visual novel note.
+3. **`Game and Visual Novel Metadata: Refresh remote metadata for active note`**: Refreshes API data (artwork, description, HLTB hours, genres, developers) while preserving all personal stats and custom frontmatter keys.
+4. **`Game and Visual Novel Metadata: Edit personal stats & review for active note`**: Open the personal stats modal to edit status, rating, dates, playtime, review, or custom links and re-render the note body from your active template.
+5. **`Game and Visual Novel Metadata: Create custom Game note manually`**: Manual creator for unlisted or indie games.
+6. **`Game and Visual Novel Metadata: Create custom Visual Novel note manually`**: Manual creator for unlisted or indie visual novels.
 
 ---
 ## Customization

@@ -73,20 +73,11 @@ export class PlaytimePromptModal extends Modal {
     const headerText = this.isEditMode
       ? `Edit Personal Stats: ${this.gameTitle}`
       : `Game Note Details: ${this.gameTitle}`;
-    contentEl.createEl("h3", { text: headerText });
+    this.setTitle(headerText);
 
     if (this.isEditMode) {
       const warningBox = contentEl.createDiv({ cls: "game-metadata-warning-box" });
-      warningBox.style.padding = "8px 12px";
-      warningBox.style.marginBottom = "14px";
-      warningBox.style.borderRadius = "4px";
-      warningBox.style.borderLeft = "4px solid var(--text-warning, #d97706)";
-      warningBox.style.backgroundColor = "var(--background-secondary)";
-      warningBox.style.fontSize = "0.85em";
-      warningBox.style.lineHeight = "1.4";
-
-      const strong = warningBox.createEl("strong", { text: "Warning: " });
-      strong.style.color = "var(--text-warning, #d97706)";
+      warningBox.createEl("strong", { text: "Warning: " });
       warningBox.createSpan({
         text: "Saving changes will re-render the note body from your active template. Any unmapped custom markdown written directly in the note body will be overwritten.",
       });
@@ -128,24 +119,15 @@ export class PlaytimePromptModal extends Modal {
       });
 
     if (this.availablePlatforms && this.availablePlatforms.length > 0) {
-      const pillsContainer = contentEl.createDiv({ cls: "game-metadata-helper-text" });
-      pillsContainer.style.marginLeft = "12px";
-      pillsContainer.style.marginTop = "-6px";
-      pillsContainer.style.marginBottom = "10px";
-      pillsContainer.style.display = "flex";
-      pillsContainer.style.flexWrap = "wrap";
-      pillsContainer.style.gap = "6px";
-
-      const label = pillsContainer.createSpan({ text: "Quick select: " });
-      label.style.alignSelf = "center";
-      label.style.opacity = "0.8";
+      const pillsContainer = contentEl.createDiv({ cls: "game-metadata-pills-container" });
+      pillsContainer.createSpan({ text: "Quick select: ", cls: "game-metadata-pills-label" });
 
       for (const plat of this.availablePlatforms) {
-        const pill = pillsContainer.createEl("button", { text: plat });
+        const pill = pillsContainer.createEl("button", {
+          text: plat,
+          cls: "game-metadata-pill-btn",
+        });
         pill.type = "button";
-        pill.style.fontSize = "0.8em";
-        pill.style.padding = "2px 8px";
-        pill.style.cursor = "pointer";
         pill.onclick = (e) => {
           e.preventDefault();
           this.platformVal = plat;
@@ -231,10 +213,9 @@ export class PlaytimePromptModal extends Modal {
           });
       });
 
-    this.durationBadgeEl = contentEl.createDiv({ cls: "game-metadata-helper-text" });
-    this.durationBadgeEl.style.marginLeft = "12px";
-    this.durationBadgeEl.style.marginTop = "-4px";
-    this.durationBadgeEl.style.marginBottom = "12px";
+    this.durationBadgeEl = contentEl.createDiv({
+      cls: "game-metadata-helper-text game-metadata-duration-badge",
+    });
     this.updateDurationBadge();
 
     new Setting(contentEl)
@@ -260,7 +241,7 @@ export class PlaytimePromptModal extends Modal {
             this.linksVal = val;
           });
         textArea.inputEl.rows = 2;
-        textArea.inputEl.style.width = "100%";
+        textArea.inputEl.addClass("game-metadata-textarea-full");
       });
 
     new Setting(contentEl)
@@ -274,7 +255,7 @@ export class PlaytimePromptModal extends Modal {
             this.notesVal = val;
           });
         textArea.inputEl.rows = 3;
-        textArea.inputEl.style.width = "100%";
+        textArea.inputEl.addClass("game-metadata-textarea-full");
       });
 
     new Setting(contentEl)
@@ -288,7 +269,7 @@ export class PlaytimePromptModal extends Modal {
             this.reviewVal = val.trim();
           });
         textArea.inputEl.rows = 3;
-        textArea.inputEl.style.width = "100%";
+        textArea.inputEl.addClass("game-metadata-textarea-full");
       });
 
     const buttonRow = contentEl.createDiv({ cls: "modal-button-container" });
@@ -333,6 +314,7 @@ export class PlaytimePromptModal extends Modal {
 
     if (!this.startDateVal || !this.endDateVal) {
       this.durationBadgeEl.setText("");
+      this.durationBadgeEl.removeClass("mod-error", "mod-accent");
       return;
     }
 
@@ -343,14 +325,17 @@ export class PlaytimePromptModal extends Modal {
       const e = new Date(this.endDateVal);
       if (!isNaN(s.getTime()) && !isNaN(e.getTime()) && e < s) {
         this.durationBadgeEl.setText("Finish date is earlier than start date.");
-        this.durationBadgeEl.style.color = "var(--text-error)";
+        this.durationBadgeEl.removeClass("mod-accent");
+        this.durationBadgeEl.addClass("mod-error");
       } else {
         this.durationBadgeEl.setText("");
+        this.durationBadgeEl.removeClass("mod-error", "mod-accent");
       }
       return;
     }
 
-    this.durationBadgeEl.style.color = "var(--text-accent)";
+    this.durationBadgeEl.removeClass("mod-error");
+    this.durationBadgeEl.addClass("mod-accent");
     if (days === 0) {
       this.durationBadgeEl.setText("Calculated Duration: 0 days (Completed on the same day)");
     } else if (days === 1) {

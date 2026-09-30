@@ -53,7 +53,7 @@ export class CustomEntryModal extends Modal {
     contentEl.empty();
     contentEl.addClass("game-metadata-custom-entry-modal");
 
-    contentEl.createEl("h3", { text: "Create Custom Entry" });
+    this.setTitle("Create Custom Entry");
     contentEl.createEl("p", {
       text: "Manually enter details for an indie, unlisted, or custom game or visual novel.",
       cls: "game-metadata-helper-text",
@@ -194,7 +194,7 @@ export class CustomEntryModal extends Modal {
             this.descriptionVal = val.trim();
           });
         textArea.inputEl.rows = 3;
-        textArea.inputEl.style.width = "100%";
+        textArea.inputEl.addClass("game-metadata-textarea-full");
       });
 
     this.addSectionHeader(contentEl, "Personal Gameplay Stats");
@@ -302,10 +302,9 @@ export class CustomEntryModal extends Modal {
           });
       });
 
-    this.durationBadgeEl = contentEl.createDiv({ cls: "game-metadata-helper-text" });
-    this.durationBadgeEl.style.marginLeft = "12px";
-    this.durationBadgeEl.style.marginTop = "-4px";
-    this.durationBadgeEl.style.marginBottom = "12px";
+    this.durationBadgeEl = contentEl.createDiv({
+      cls: "game-metadata-helper-text game-metadata-duration-badge",
+    });
     this.updateDurationBadge();
 
     new Setting(contentEl)
@@ -331,7 +330,7 @@ export class CustomEntryModal extends Modal {
             this.linksVal = val;
           });
         textArea.inputEl.rows = 2;
-        textArea.inputEl.style.width = "100%";
+        textArea.inputEl.addClass("game-metadata-textarea-full");
       });
 
     new Setting(contentEl)
@@ -345,7 +344,7 @@ export class CustomEntryModal extends Modal {
             this.notesVal = val;
           });
         textArea.inputEl.rows = 3;
-        textArea.inputEl.style.width = "100%";
+        textArea.inputEl.addClass("game-metadata-textarea-full");
       });
 
     new Setting(contentEl)
@@ -359,7 +358,7 @@ export class CustomEntryModal extends Modal {
             this.reviewVal = val.trim();
           });
         textArea.inputEl.rows = 3;
-        textArea.inputEl.style.width = "100%";
+        textArea.inputEl.addClass("game-metadata-textarea-full");
       });
 
     const buttonRow = contentEl.createDiv({ cls: "modal-button-container" });
@@ -437,6 +436,7 @@ export class CustomEntryModal extends Modal {
 
     if (!this.startDateVal || !this.endDateVal) {
       this.durationBadgeEl.setText("");
+      this.durationBadgeEl.removeClass("mod-error", "mod-accent");
       return;
     }
 
@@ -446,14 +446,17 @@ export class CustomEntryModal extends Modal {
       const e = new Date(this.endDateVal);
       if (!isNaN(s.getTime()) && !isNaN(e.getTime()) && e < s) {
         this.durationBadgeEl.setText("Finish date is earlier than start date.");
-        this.durationBadgeEl.style.color = "var(--text-error)";
+        this.durationBadgeEl.removeClass("mod-accent");
+        this.durationBadgeEl.addClass("mod-error");
       } else {
         this.durationBadgeEl.setText("");
+        this.durationBadgeEl.removeClass("mod-error", "mod-accent");
       }
       return;
     }
 
-    this.durationBadgeEl.style.color = "var(--text-accent)";
+    this.durationBadgeEl.removeClass("mod-error");
+    this.durationBadgeEl.addClass("mod-accent");
     if (days === 0) {
       this.durationBadgeEl.setText("Calculated Duration: 0 days (Completed on the same day)");
     } else if (days === 1) {
@@ -464,10 +467,7 @@ export class CustomEntryModal extends Modal {
   }
 
   private addSectionHeader(containerEl: HTMLElement, title: string) {
-    containerEl.createEl("div", {
-      text: title,
-      cls: "game-metadata-settings-section-header",
-    });
+    new Setting(containerEl).setName(title).setHeading();
   }
 
   onClose() {
