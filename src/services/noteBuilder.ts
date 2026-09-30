@@ -40,17 +40,20 @@ export class NoteBuilder {
     const frontmatterRegex = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/;
     const match = existingContent.match(frontmatterRegex);
 
-    let existingProps: Record<string, any> = {};
+    let existingProps: Record<string, unknown> = {};
     if (match) {
       try {
-        existingProps = parseYaml(match[1]) || {};
+        const parsed = parseYaml(match[1]) as Record<string, unknown> | null;
+        if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+          existingProps = parsed;
+        }
       } catch (e) {
         console.warn("[GameMetadata] Failed to parse existing YAML:", e);
       }
     }
 
     const newFrontmatterProps = this.buildFrontmatterObject(game, settings);
-    const mergedProps = Object.assign({}, existingProps, newFrontmatterProps);
+    const mergedProps: Record<string, unknown> = Object.assign({}, existingProps, newFrontmatterProps);
 
     // Clean any empty or undefined properties
     for (const [k, v] of Object.entries(mergedProps)) {
@@ -91,13 +94,13 @@ export class NoteBuilder {
   static buildFrontmatterObject(
     game: GameMetadata,
     settings: GameMetadataPluginSettings
-  ): Record<string, any> {
+  ): Record<string, unknown> {
     // Ensure all keys are defined with safe fallbacks
     const keys = Object.assign({}, DEFAULT_FRONTMATTER_KEYS, settings.customFrontmatterKeys);
-    const result: Record<string, any> = {};
+    const result: Record<string, unknown> = {};
 
     // Set property helper
-    const setProp = (keyName: string | undefined, val: any) => {
+    const setProp = (keyName: string | undefined, val: unknown) => {
       if (!keyName || keyName === "undefined" || val === undefined || val === null || val === "") return;
       result[keyName] = val;
     };

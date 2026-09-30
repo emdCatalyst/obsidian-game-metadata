@@ -14,10 +14,6 @@ export class GameMetadataSettingTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
-
-    
-    // Provider & API Keys
-    
     this.addSectionHeader(containerEl, "API & Data Providers");
 
     new Setting(containerEl)
@@ -48,8 +44,7 @@ export class GameMetadataSettingTab extends PluginSettingTab {
           });
       });
 
-    // Test RAWG API Key button
-    const testSetting = new Setting(containerEl)
+    new Setting(containerEl)
       .setName("Test RAWG API Connection")
       .setDesc("Verify that your RAWG API key is active and communicating with the database.")
       .addButton((button) => {
@@ -69,7 +64,7 @@ export class GameMetadataSettingTab extends PluginSettingTab {
               headers: { "User-Agent": "ObsidianGameMetadataPlugin/1.0" },
             });
 
-            if (res.status === 200 && res.json?.results) {
+            if (res.status === 200 && res.json && typeof res.json === "object" && "results" in res.json) {
               new Notice("RAWG API key is valid and connected successfully!");
               button.setButtonText("Connected");
             } else {
@@ -77,19 +72,17 @@ export class GameMetadataSettingTab extends PluginSettingTab {
               button.setButtonText("Failed");
             }
           } catch (error) {
-            new Notice(`Connection failed: ${error.message}`);
+            const msg = error instanceof Error ? error.message : String(error);
+            new Notice(`Connection failed: ${msg}`);
             button.setButtonText("Failed");
           } finally {
-            setTimeout(() => {
+            window.setTimeout(() => {
               button.setButtonText("Test RAWG Key").setDisabled(false);
             }, 3000);
           }
         });
       });
 
-    
-    // Folder Structure & Subfolder Organization
-    
     this.addSectionHeader(containerEl, "Note Storage & Folder Structure");
 
     new Setting(containerEl)
@@ -191,9 +184,6 @@ export class GameMetadataSettingTab extends PluginSettingTab {
           });
       });
 
-    
-    // HowLongToBeat & Playtime Integration
-    
     this.addSectionHeader(containerEl, "HowLongToBeat & Playtime");
 
     new Setting(containerEl)
@@ -220,9 +210,6 @@ export class GameMetadataSettingTab extends PluginSettingTab {
           });
       });
 
-    
-    // Banner Plugin Integration
-    
     this.addSectionHeader(containerEl, "Banner Plugin Integration");
 
     new Setting(containerEl)
@@ -272,16 +259,12 @@ export class GameMetadataSettingTab extends PluginSettingTab {
         slider
           .setLimits(0.0, 1.0, 0.05)
           .setValue(this.plugin.settings.bannerYOffset)
-          .setDynamicTooltip()
           .onChange(async (value) => {
             this.plugin.settings.bannerYOffset = value;
             await this.plugin.saveSettings();
           });
       });
 
-    
-    // Dataview & Properties Integration
-    
     this.addSectionHeader(containerEl, "Dataview & Frontmatter Properties");
 
     new Setting(containerEl)
@@ -314,9 +297,6 @@ export class GameMetadataSettingTab extends PluginSettingTab {
           });
       });
 
-    
-    // Note Body Template Customizer
-    
     this.addSectionHeader(containerEl, "Custom Note Template");
 
     containerEl.createDiv({

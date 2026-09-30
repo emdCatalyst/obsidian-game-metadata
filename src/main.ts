@@ -23,8 +23,6 @@ export default class GameMetadataPlugin extends Plugin {
   fileService: FileService;
 
   async onload() {
-    console.log("[GameMetadata] Loading Game & Visual Novel Metadata plugin");
-
     HltbService.clearCache();
 
     await this.loadSettings();
@@ -41,11 +39,11 @@ export default class GameMetadataPlugin extends Plugin {
       this.vndbProvider
     );
 
-    this.addRibbonIcon("gamepad-2", "Search Video Game (RAWG / Steam)", (evt: MouseEvent) => {
+    this.addRibbonIcon("gamepad-2", "Search Video Game (RAWG / Steam)", () => {
       this.openSearchModal("game");
     });
 
-    this.addRibbonIcon("book-open", "Search Visual Novel (VNDB)", (evt: MouseEvent) => {
+    this.addRibbonIcon("book-open", "Search Visual Novel (VNDB)", () => {
       this.openSearchModal("visual_novel");
     });
 
@@ -75,7 +73,7 @@ export default class GameMetadataPlugin extends Plugin {
         if (!activeFile || activeFile.extension !== "md") return false;
         if (checking) return true;
 
-        this.fileService.refreshActiveNoteMetadata(activeFile);
+        void this.fileService.refreshActiveNoteMetadata(activeFile);
         return true;
       },
     });
@@ -90,15 +88,15 @@ export default class GameMetadataPlugin extends Plugin {
         if (!activeFile || activeFile.extension !== "md") return false;
         if (checking) return true;
 
-        this.fileService.extractMetadataFromActiveNote(activeFile).then((res) => {
+        void this.fileService.extractMetadataFromActiveNote(activeFile).then((res) => {
           if (!res) return;
           new PlaytimePromptModal(
             this.app,
             res.gameTitle,
-            res.stats.status || this.settings.defaultPlayStatus,
+            res.stats.status ?? this.settings.defaultPlayStatus,
             res.platforms,
-            async (userInput) => {
-              await this.fileService.updateActiveNotePersonalStats(userInput, res.file);
+            (userInput) => {
+              void this.fileService.updateActiveNotePersonalStats(userInput, res.file);
             },
             res.stats,
             true
@@ -128,18 +126,17 @@ export default class GameMetadataPlugin extends Plugin {
   }
 
   onunload() {
-    console.log("[GameMetadata] Unloading plugin and purging caches");
     HltbService.clearCache();
   }
 
   async loadSettings() {
-    const loadedData = await this.loadData();
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, loadedData);
+    const loadedData = (await this.loadData()) as Partial<GameMetadataPluginSettings> | null;
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, loadedData ?? {});
 
     this.settings.customFrontmatterKeys = Object.assign(
       {},
       DEFAULT_FRONTMATTER_KEYS,
-      loadedData?.customFrontmatterKeys
+      loadedData?.customFrontmatterKeys ?? {}
     );
   }
 

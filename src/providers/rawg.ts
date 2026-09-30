@@ -2,6 +2,49 @@ import { requestUrl } from "obsidian";
 import { GameMetadata } from "../models/game";
 import { GameDataProvider } from "./base";
 
+interface RawgNamedItem {
+  id?: number;
+  name?: string;
+  slug?: string;
+}
+
+interface RawgPlatformEntry {
+  platform?: { id?: number; name?: string; slug?: string };
+}
+
+interface RawgScreenshotItem {
+  id?: number;
+  image?: string;
+}
+
+interface RawgGameResult {
+  id: number;
+  name: string;
+  slug?: string;
+  released?: string;
+  background_image?: string;
+  rating?: number;
+  metacritic?: number;
+  platforms?: RawgPlatformEntry[];
+  genres?: RawgNamedItem[];
+}
+
+interface RawgSearchResponse {
+  results?: RawgGameResult[];
+}
+
+interface RawgGameDetailsResponse extends RawgGameResult {
+  description_raw?: string;
+  description?: string;
+  background_image_additional?: string;
+  developers?: RawgNamedItem[];
+  publishers?: RawgNamedItem[];
+  tags?: RawgNamedItem[];
+  esrb_rating?: { id?: number; name?: string; slug?: string };
+  website?: string;
+  playtime?: number;
+}
+
 export class RawgProvider implements GameDataProvider {
   readonly id = "rawg";
   readonly name = "RAWG Video Games Database";
@@ -42,12 +85,12 @@ export class RawgProvider implements GameDataProvider {
         throw new Error(`RAWG API error: ${response.status} ${response.text}`);
       }
 
-      const data = response.json;
+      const data = response.json as RawgSearchResponse;
       if (!data.results || !Array.isArray(data.results)) {
         return [];
       }
 
-      return data.results.map((item: any) => this.mapSearchItemToMetadata(item));
+      return data.results.map((item) => this.mapSearchItemToMetadata(item));
     } catch (error) {
       console.error("[GameMetadata] RAWG Search error:", error);
       throw error;
@@ -75,7 +118,7 @@ export class RawgProvider implements GameDataProvider {
         throw new Error(`RAWG API error: ${response.status} ${response.text}`);
       }
 
-      const data = response.json;
+      const data = response.json as RawgGameDetailsResponse;
 
       // Try fetching screenshots
       let screenshots: string[] = [];
@@ -84,10 +127,13 @@ export class RawgProvider implements GameDataProvider {
           url: screenshotsUrl,
           method: "GET",
         });
-        if (screensResponse.status === 200 && screensResponse.json?.results) {
-          screenshots = screensResponse.json.results.map((s: any) => s.image).filter(Boolean);
+        const screensData = screensResponse.json as { results?: RawgScreenshotItem[] };
+        if (screensResponse.status === 200 && Array.isArray(screensData?.results)) {
+          screenshots = screensData.results
+            .map((s) => s.image)
+            .filter((img): img is string => typeof img === "string" && img.length > 0);
         }
-      } catch (e) {
+      } catch {
         // Optional screenshots failure, non-fatal
       }
 
@@ -98,12 +144,18 @@ export class RawgProvider implements GameDataProvider {
     }
   }
 
-  private mapSearchItemToMetadata(item: any): GameMetadata {
+  private mapSearchItemToMetadata(item: RawgGameResult): GameMetadata {
     const releaseYear = item.released ? item.released.substring(0, 4) : undefined;
     const platforms = item.platforms
-      ? item.platforms.map((p: any) => p.platform?.name).filter(Boolean)
+      ? item.platforms
+          .map((p) => p.platform?.name)
+          .filter((name): name is string => typeof name === "string" && name.length > 0)
       : [];
-    const genres = item.genres ? item.genres.map((g: any) => g.name).filter(Boolean) : [];
+    const genres = item.genres
+      ? item.genres
+          .map((g) => g.name)
+          .filter((name): name is string => typeof name === "string" && name.length > 0)
+      : [];
 
     return {
       id: item.id,
@@ -121,20 +173,39 @@ export class RawgProvider implements GameDataProvider {
     };
   }
 
-  private mapFullDetailsToMetadata(data: any, screenshots: string[]): GameMetadata {
+  private mapFullDetailsToMetadata(data: RawgGameDetailsResponse, screenshots: string[]): GameMetadata {
     const releaseYear = data.released ? data.released.substring(0, 4) : undefined;
     const platforms = data.platforms
-      ? data.platforms.map((p: any) => p.platform?.name).filter(Boolean)
+      ? data.platforms
+          .map((p) => p.platform?.name)
+          .filter((name): name is string => typeof name === "string" && name.length > 0)
       : [];
-    const genres = data.genres ? data.genres.map((g: any) => g.name).filter(Boolean) : [];
-    const developers = data.developers ? data.developers.map((d: any) => d.name).filter(Boolean) : [];
-    const publishers = data.publishers ? data.publishers.map((p: any) => p.name).filter(Boolean) : [];
-    const tags = data.tags ? data.tags.map((t: any) => t.name).slice(0, 10).filter(Boolean) : [];
+    const genres = data.genres
+      ? data.genres
+          .map((g) => g.name)
+          .filter((name): name is string => typeof name === "string" && name.length > 0)
+      : [];
+    const developers = data.developers
+      ? data.developers
+          .map((d) => d.name)
+          .filter((name): name is string => typeof name === "string" && name.length > 0)
+      : [];
+    const publishers = data.publishers
+      ? data.publishers
+          .map((p) => p.name)
+          .filter((name): name is string => typeof name === "string" && name.length > 0)
+      : [];
+    const tags = data.tags
+      ? data.tags
+          .map((t) => t.name)
+          .filter((name): name is string => typeof name === "string" && name.length > 0)
+          .slice(0, 10)
+      : [];
 
-      let description = data.description_raw || "";
-      if (!description && data.description) {
-        description = data.description.replace(/<[^>]*>?/gm, "").trim();
-      }
+    let description = data.description_raw || "";
+    if (!description && data.description) {
+      description = data.description.replace(/<[^>]*>?/gm, "").trim();
+    }
 
     return {
       id: data.id,

@@ -2,6 +2,40 @@ import { requestUrl } from "obsidian";
 import { GameMetadata } from "../models/game";
 import { GameDataProvider } from "./base";
 
+interface SteamStoreSearchItem {
+  id: number | string;
+  name: string;
+  tiny_image?: string;
+  metascore?: string | number;
+  platforms?: { windows?: boolean; mac?: boolean; linux?: boolean };
+}
+
+interface SteamSearchApiResponse {
+  items?: SteamStoreSearchItem[];
+}
+
+interface SteamAppDetailsData {
+  name: string;
+  release_date?: { date?: string };
+  genres?: Array<{ id?: string; description?: string }>;
+  developers?: string[];
+  publishers?: string[];
+  screenshots?: Array<{ id?: number; path_full?: string }>;
+  short_description?: string;
+  detailed_description?: string;
+  header_image?: string;
+  metacritic?: { score?: number; url?: string };
+  website?: string;
+  platforms?: { windows?: boolean; mac?: boolean; linux?: boolean };
+}
+
+interface SteamAppDetailsResponse {
+  [appId: string]: {
+    success: boolean;
+    data?: SteamAppDetailsData;
+  };
+}
+
 export class SteamProvider implements GameDataProvider {
   readonly id = "steam";
   readonly name = "Steam Store";
@@ -28,12 +62,12 @@ export class SteamProvider implements GameDataProvider {
         throw new Error(`Steam API error: ${response.status}`);
       }
 
-      const data = response.json;
+      const data = response.json as SteamSearchApiResponse;
       if (!data.items || !Array.isArray(data.items)) {
         return [];
       }
 
-      return data.items.map((item: any) => ({
+      return data.items.map((item: SteamStoreSearchItem) => ({
         id: item.id.toString(),
         steamId: item.id.toString(),
         title: item.name,
@@ -69,7 +103,8 @@ export class SteamProvider implements GameDataProvider {
         throw new Error(`Steam API error: ${response.status}`);
       }
 
-      const appData = response.json[id.toString()];
+      const responseData = response.json as SteamAppDetailsResponse;
+      const appData = responseData[id.toString()];
       if (!appData || !appData.success || !appData.data) {
         throw new Error("Game not found on Steam.");
       }
@@ -77,10 +112,18 @@ export class SteamProvider implements GameDataProvider {
       const data = appData.data;
       const releaseDate = data.release_date?.date || "";
       const releaseYear = releaseDate.match(/\d{4}/)?.[0];
-      const genres = data.genres ? data.genres.map((g: any) => g.description) : [];
+      const genres = data.genres
+        ? data.genres
+            .map((g) => g.description)
+            .filter((d): d is string => typeof d === "string" && d.length > 0)
+        : [];
       const developers = data.developers || [];
       const publishers = data.publishers || [];
-      const screenshots = data.screenshots ? data.screenshots.map((s: any) => s.path_full) : [];
+      const screenshots = data.screenshots
+        ? data.screenshots
+            .map((s) => s.path_full)
+            .filter((p): p is string => typeof p === "string" && p.length > 0)
+        : [];
 
       let cleanDesc = data.short_description || "";
       if (!cleanDesc && data.detailed_description) {

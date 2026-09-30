@@ -1,5 +1,5 @@
 import { App, TFile, normalizePath, Notice, MarkdownView, parseYaml } from "obsidian";
-import { GameMetadata, GameMetadataPluginSettings, DEFAULT_FRONTMATTER_KEYS } from "../models/game";
+import { GameMetadata, GameMetadataPluginSettings, DEFAULT_FRONTMATTER_KEYS, PlayStatus } from "../models/game";
 import { RawgProvider } from "../providers/rawg";
 import { SteamProvider } from "../providers/steam";
 import { VndbProvider } from "../providers/vndb";
@@ -7,6 +7,19 @@ import { HltbService } from "./hltbService";
 import { IdentifierService } from "./identifierService";
 import { TemplateEngine } from "./templateEngine";
 import { NoteBuilder } from "./noteBuilder";
+
+export interface ActiveNoteStatsInput {
+  status?: PlayStatus;
+  userRating?: string;
+  userPlatform?: string;
+  userPlaytime?: string;
+  startDate?: string;
+  endDate?: string;
+  version?: string;
+  userReview?: string;
+  userNotes?: string;
+  links?: string[];
+}
 
 export class FileService {
   private app: App;
@@ -93,7 +106,8 @@ export class FileService {
       return newFile;
     } catch (error) {
       console.error("[GameMetadata] Error creating note:", error);
-      new Notice(`Failed to create note: ${error.message}`);
+      const msg = error instanceof Error ? error.message : String(error);
+      new Notice(`Failed to create note: ${msg}`);
       return null;
     }
   }
@@ -102,23 +116,26 @@ export class FileService {
    * Extract complete GameMetadata model from note cache and frontmatter.
    */
   extractFullGameMetadata(file: TFile, content: string): GameMetadata {
-    let fm: Record<string, any> = {};
+    let fm: Record<string, unknown> = {};
     const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
     if (match) {
       try {
-        fm = parseYaml(match[1]) || {};
+        const parsed = parseYaml(match[1]) as Record<string, unknown> | null;
+        if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+          fm = parsed;
+        }
       } catch (e) {
         console.warn("[GameMetadata] Error parsing frontmatter:", e);
       }
     }
     if (Object.keys(fm).length === 0) {
       const cache = this.app.metadataCache.getFileCache(file);
-      fm = cache?.frontmatter || {};
+      fm = (cache?.frontmatter as Record<string, unknown>) || {};
     }
 
     const keys = Object.assign({}, DEFAULT_FRONTMATTER_KEYS, this.settings.customFrontmatterKeys);
 
-    const getVal = (keyName: string, ...fallbacks: string[]) => {
+    const getVal = (keyName: string, ...fallbacks: string[]): unknown => {
       if (fm[keyName] !== undefined && fm[keyName] !== null && fm[keyName] !== "") return fm[keyName];
       for (const fb of fallbacks) {
         if (fm[fb] !== undefined && fm[fb] !== null && fm[fb] !== "") return fm[fb];
@@ -126,20 +143,36 @@ export class FileService {
       return undefined;
     };
 
-    const parseNum = (val: any): number | undefined => {
+    const parseNum = (val: unknown): number | undefined => {
       if (val === undefined || val === null || val === "") return undefined;
       const n = Number(val);
       return isNaN(n) ? undefined : n;
     };
 
-    const parseStr = (val: any): string | undefined => {
+    const parseStr = (val: unknown): string | undefined => {
       if (val === undefined || val === null || val === "") return undefined;
-      return String(val).trim();
+      if (typeof val === "string") {
+        const trimmed = val.trim();
+        return trimmed.length > 0 ? trimmed : undefined;
+      }
+      if (typeof val === "number" || typeof val === "boolean") {
+        return String(val);
+      }
+      return undefined;
     };
 
-    const parseArr = (val: any): string[] => {
-      if (Array.isArray(val)) return val.map((v) => String(v).trim()).filter(Boolean);
-      if (typeof val === "string") return val.split(",").map((s) => s.trim()).filter(Boolean);
+    const parseArr = (val: unknown): string[] => {
+      if (Array.isArray(val)) {
+        return val
+          .map((v) => (typeof v === "string" ? v.trim() : typeof v === "number" ? String(v) : ""))
+          .filter((v) => v.length > 0);
+      }
+      if (typeof val === "string") {
+        return val
+          .split(",")
+          .map((s) => s.trim())
+          .filter((s) => s.length > 0);
+      }
       return [];
     };
 
@@ -150,6 +183,10 @@ export class FileService {
     const userNotes = parseStr(getVal(keys.notes, "user_notes", "notes"));
     const links = parseArr(getVal(keys.links, "links"));
 
+    const rawReleased = getVal(keys.released, "released");
+    const rawReleasedStr = typeof rawReleased === "string" ? rawReleased : undefined;
+    const releaseYearVal = parseStr(getVal(keys.year, "year")) || (rawReleasedStr ? rawReleasedStr.substring(0, 4) : undefined);
+
     return {
       id: parseStr(getVal(keys.id, "id")) || file.basename,
       title: parseStr(getVal(keys.title, "title")) || file.basename,
@@ -157,7 +194,7 @@ export class FileService {
       slug: parseStr(getVal(keys.slug, "slug")),
       type: mediaType,
       releaseDate: parseStr(getVal(keys.released, "released", "release_date")),
-      releaseYear: parseStr(getVal(keys.year, "year")) || (getVal(keys.released, "released") ? String(getVal(keys.released, "released")).substring(0, 4) : undefined),
+      releaseYear: releaseYearVal,
       rating: parseNum(getVal(keys.rating, "rating")),
       metacritic: parseNum(getVal(keys.metacritic, "metacritic")),
       hltbMain: parseNum(getVal(keys.hltbMain, "hltb_main")),
@@ -177,7 +214,7 @@ export class FileService {
       description: parseStr(getVal(keys.description, "description")),
       shortDescription: parseStr(getVal(keys.shortDescription, "short_description")),
 
-      userStatus: (parseStr(getVal(keys.status, "status")) as any) || this.settings.defaultPlayStatus,
+      userStatus: parseStr(getVal(keys.status, "status")) || this.settings.defaultPlayStatus,
       userRating: parseStr(getVal(keys.userRating, "user_rating")),
       userPlatform: parseStr(getVal(keys.userPlatform, "user_platform", "platform_played")),
       userPlaytime: parseStr(getVal(keys.userPlaytime, "user_playtime")),
@@ -197,18 +234,7 @@ export class FileService {
   async extractMetadataFromActiveNote(targetFile?: TFile): Promise<{
     file: TFile;
     gameTitle: string;
-    stats: {
-      status?: any;
-      userRating?: string;
-      userPlatform?: string;
-      userPlaytime?: string;
-      startDate?: string;
-      endDate?: string;
-      version?: string;
-      userReview?: string;
-      userNotes?: string;
-      links?: string[];
-    };
+    stats: ActiveNoteStatsInput;
     platforms: string[];
     mediaType: "game" | "visual_novel";
   } | null> {
@@ -226,8 +252,8 @@ export class FileService {
       const content = await this.app.vault.read(activeFile);
       const game = this.extractFullGameMetadata(activeFile, content);
 
-      const stats = {
-        status: game.userStatus || this.settings.defaultPlayStatus,
+      const stats: ActiveNoteStatsInput = {
+        status: (game.userStatus as PlayStatus) || this.settings.defaultPlayStatus,
         userRating: game.userRating || "",
         userPlatform: game.userPlatform || "",
         userPlaytime: game.userPlaytime || "",
@@ -255,7 +281,7 @@ export class FileService {
   /**
    * Update personal stats in active note by re-rendering from template and optionally relocate if status folder changed.
    */
-  async updateActiveNotePersonalStats(stats: any, targetFile?: TFile): Promise<boolean> {
+  async updateActiveNotePersonalStats(stats: ActiveNoteStatsInput, targetFile?: TFile): Promise<boolean> {
     const activeFile =
       targetFile ||
       this.app.workspace.getActiveFile() ||
@@ -308,7 +334,8 @@ export class FileService {
       return true;
     } catch (error) {
       console.error("[GameMetadata] Error updating personal stats:", error);
-      new Notice(`Failed to update personal stats: ${error.message}`);
+      const msg = error instanceof Error ? error.message : String(error);
+      new Notice(`Failed to update personal stats: ${msg}`);
       return false;
     }
   }
@@ -440,10 +467,12 @@ export class FileService {
     } catch (error) {
       loadingNotice.hide();
       console.error("[GameMetadata] Error refreshing metadata:", error);
-      new Notice(`Failed to refresh metadata: ${error.message}`);
+      const msg = error instanceof Error ? error.message : String(error);
+      new Notice(`Failed to refresh metadata: ${msg}`);
       return false;
     }
   }
+
   private async ensureFolderHierarchy(folderPath: string) {
     if (!folderPath || folderPath === "/" || folderPath === ".") return;
 
@@ -456,7 +485,7 @@ export class FileService {
       if (!folder) {
         try {
           await this.app.vault.createFolder(currentPath);
-        } catch (e) {
+        } catch {
           // Ignore if exists
         }
       }

@@ -67,7 +67,7 @@ export class TemplateEngine {
         else if (host.includes("discord.gg") || host.includes("discord.com")) label = "Discord";
         else if (host.includes("github.com")) label = "GitHub";
         else label = host;
-      } catch (e) {
+      } catch {
         label = "Link";
       }
 
@@ -288,14 +288,14 @@ export class TemplateEngine {
 
   static sanitizeFileName(name: string): string {
     return name
-      .replace(/[\\/:*?"<>|#^\[\]]/g, "")
+      .replace(/[\\/:*?"<>|#^[\]]/g, "")
       .replace(/\s+/g, " ")
       .trim();
   }
 
   static sanitizeFolderName(name: string): string {
     return name
-      .replace(/[*?"<>|#^\[\]]/g, "")
+      .replace(/[*?"<>|#^[\]]/g, "")
       .replace(/\s+/g, " ")
       .trim();
   }

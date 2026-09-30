@@ -70,33 +70,36 @@ export class GameSearchModal extends SuggestModal<GameMetadata> {
         window.clearTimeout(this.debounceTimer);
       }
 
-      this.debounceTimer = window.setTimeout(async () => {
-        const customEntryOption: GameMetadata = {
-          id: "__custom_entry__",
-          title: `Create custom entry for "${trimmed}"...`,
-          rawProvider: "vndb" as any,
-          type: this.mediaType,
-        };
-        (customEntryOption as any)._customTitle = trimmed;
+      this.debounceTimer = window.setTimeout(() => {
+        void (async () => {
+          const customEntryOption: GameMetadata = {
+            id: "__custom_entry__",
+            title: `Create custom entry for "${trimmed}"...`,
+            rawProvider: "vndb",
+            type: this.mediaType,
+            customTitle: trimmed,
+          };
 
-        try {
-          const results = await activeProvider.search(trimmed);
-          resolve([...results, customEntryOption]);
-        } catch (error) {
-          console.error("[GameMetadata] Search error:", error);
-          if (activeProvider.id === "rawg") {
-            try {
-              new Notice("RAWG search failed. Falling back to Steam Store...", 2000);
-              const fallbackResults = await this.steamFallback.search(trimmed);
-              resolve([...fallbackResults, customEntryOption]);
-              return;
-            } catch (fallbackErr) {
-              console.error("[GameMetadata] Fallback error:", fallbackErr);
+          try {
+            const results = await activeProvider.search(trimmed);
+            resolve([...results, customEntryOption]);
+          } catch (error) {
+            console.error("[GameMetadata] Search error:", error);
+            if (activeProvider.id === "rawg") {
+              try {
+                new Notice("RAWG search failed. Falling back to Steam Store...", 2000);
+                const fallbackResults = await this.steamFallback.search(trimmed);
+                resolve([...fallbackResults, customEntryOption]);
+                return;
+              } catch (fallbackErr) {
+                console.error("[GameMetadata] Fallback error:", fallbackErr);
+              }
             }
+            const msg = error instanceof Error ? error.message : String(error);
+            new Notice(`Search error: ${msg}`);
+            resolve([customEntryOption]);
           }
-          new Notice(`Search error: ${error.message}`);
-          resolve([customEntryOption]);
-        }
+        })();
       }, 350);
     });
   }
@@ -193,9 +196,13 @@ export class GameSearchModal extends SuggestModal<GameMetadata> {
     }
   }
 
-  async onChooseSuggestion(game: GameMetadata, evt: MouseEvent | KeyboardEvent) {
+  onChooseSuggestion(game: GameMetadata): void {
+    void this.handleChoice(game);
+  }
+
+  private async handleChoice(game: GameMetadata): Promise<void> {
     if (game.id === "__custom_entry__") {
-      const customTitle = (game as any)._customTitle || "";
+      const customTitle = game.customTitle || "";
       new CustomEntryModal(this.app, this.fileService, this.settings, customTitle, this.mediaType).open();
       return;
     }
@@ -235,25 +242,8 @@ export class GameSearchModal extends SuggestModal<GameMetadata> {
           fullDetails.title,
           this.settings.defaultPlayStatus,
           fullDetails.platforms || [],
-          async (userInput: UserPlaytimeInput) => {
-            if (userInput.userPlaytime) {
-              fullDetails.userPlaytime = userInput.userPlaytime;
-            }
-            if (userInput.userRating) fullDetails.userRating = userInput.userRating;
-            if (userInput.status) fullDetails.userStatus = userInput.status;
-            if (userInput.userPlatform) fullDetails.userPlatform = userInput.userPlatform;
-            if (userInput.userReview) fullDetails.userReview = userInput.userReview;
-            if (userInput.startDate) fullDetails.userStartDate = userInput.startDate;
-            if (userInput.endDate) fullDetails.userEndDate = userInput.endDate;
-            if (userInput.version) fullDetails.userVersion = userInput.version;
-            if (userInput.links) fullDetails.links = userInput.links;
-            if (userInput.userNotes) fullDetails.userNotes = userInput.userNotes;
-            fullDetails.daysToBeat = TemplateEngine.calculateDaysBetween(
-              fullDetails.userStartDate,
-              fullDetails.userEndDate
-            );
-
-            await this.fileService.createGameNote(fullDetails);
+          (userInput: UserPlaytimeInput) => {
+            void this.saveUserStatsAndNote(fullDetails, userInput);
           },
           {
             links: fullDetails.links,
@@ -266,7 +256,29 @@ export class GameSearchModal extends SuggestModal<GameMetadata> {
     } catch (error) {
       loadingNotice.hide();
       console.error("[GameMetadata] Error on selection:", error);
-      new Notice(`Failed to fetch details: ${error.message}`);
+      const msg = error instanceof Error ? error.message : String(error);
+      new Notice(`Failed to fetch details: ${msg}`);
     }
+  }
+
+  private async saveUserStatsAndNote(fullDetails: GameMetadata, userInput: UserPlaytimeInput): Promise<void> {
+    if (userInput.userPlaytime) {
+      fullDetails.userPlaytime = userInput.userPlaytime;
+    }
+    if (userInput.userRating) fullDetails.userRating = userInput.userRating;
+    if (userInput.status) fullDetails.userStatus = userInput.status;
+    if (userInput.userPlatform) fullDetails.userPlatform = userInput.userPlatform;
+    if (userInput.userReview) fullDetails.userReview = userInput.userReview;
+    if (userInput.startDate) fullDetails.userStartDate = userInput.startDate;
+    if (userInput.endDate) fullDetails.userEndDate = userInput.endDate;
+    if (userInput.version) fullDetails.userVersion = userInput.version;
+    if (userInput.links) fullDetails.links = userInput.links;
+    if (userInput.userNotes) fullDetails.userNotes = userInput.userNotes;
+    fullDetails.daysToBeat = TemplateEngine.calculateDaysBetween(
+      fullDetails.userStartDate,
+      fullDetails.userEndDate
+    );
+
+    await this.fileService.createGameNote(fullDetails);
   }
 }

@@ -14,6 +14,25 @@ interface HltbAuthSession {
   expiresAt: number;
 }
 
+interface HltbInitResponse {
+  token?: string;
+  hpKey?: string;
+  hpVal?: string;
+}
+
+interface HltbSearchItem {
+  game_id?: number;
+  game_name?: string;
+  game_type?: string;
+  comp_main?: number;
+  comp_plus?: number;
+  comp_100?: number;
+}
+
+interface HltbSearchApiResponse {
+  data?: HltbSearchItem[];
+}
+
 export class HltbService {
   private static cachedSession: HltbAuthSession | null = null;
   private static readonly USER_AGENT =
@@ -47,7 +66,7 @@ export class HltbService {
       });
 
       if (response.status === 200 && response.json) {
-        const data = response.json;
+        const data = response.json as HltbInitResponse;
         if (data.token) {
           this.cachedSession = {
             token: data.token,
@@ -83,7 +102,7 @@ export class HltbService {
       .trim();
     const searchTerms = cleanTitle.split(" ").filter(Boolean);
 
-    const body: Record<string, any> = {
+    const body: Record<string, unknown> = {
       searchType: "games",
       searchTerms: searchTerms,
       searchPage: 1,
@@ -154,12 +173,13 @@ export class HltbService {
         }
       }
 
-      if (response.status === 200 && response.json?.data && Array.isArray(response.json.data)) {
-        const items = response.json.data;
+      const responseData = response.json as HltbSearchApiResponse;
+      if (response.status === 200 && responseData?.data && Array.isArray(responseData.data)) {
+        const items = responseData.data;
         if (items.length > 0) {
-          const gameItem = items.find((it: any) => it.game_type === "game") || items[0];
+          const gameItem = items.find((it) => it.game_type === "game") || items[0];
           return {
-            gameName: gameItem.game_name,
+            gameName: gameItem.game_name || gameTitle,
             gameplayMain: Math.round(((gameItem.comp_main || 0) / 3600) * 10) / 10,
             gameplayMainExtra: Math.round(((gameItem.comp_plus || 0) / 3600) * 10) / 10,
             gameplayCompletionist: Math.round(((gameItem.comp_100 || 0) / 3600) * 10) / 10,

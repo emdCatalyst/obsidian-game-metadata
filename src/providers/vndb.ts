@@ -2,6 +2,52 @@ import { requestUrl } from "obsidian";
 import { GameMetadata } from "../models/game";
 import { GameDataProvider } from "./base";
 
+interface VndbTitleEntry {
+  title: string;
+  latin?: string;
+  lang: string;
+  official?: boolean;
+  main?: boolean;
+}
+
+interface VndbDeveloperEntry {
+  id?: string;
+  name: string;
+  original?: string;
+}
+
+interface VndbTagEntry {
+  name: string;
+  rating?: number;
+}
+
+interface VndbScreenshotEntry {
+  url?: string;
+}
+
+interface VndbVisualNovelItem {
+  id: string;
+  title: string;
+  alttitle?: string;
+  titles?: VndbTitleEntry[];
+  released?: string;
+  image?: { url?: string; sexual?: number; violence?: number };
+  screenshots?: VndbScreenshotEntry[];
+  rating?: number;
+  votecount?: number;
+  length?: number;
+  length_minutes?: number;
+  description?: string;
+  tags?: VndbTagEntry[];
+  developers?: VndbDeveloperEntry[];
+  languages?: string[];
+  platforms?: string[];
+}
+
+interface VndbKanaResponse {
+  results?: VndbVisualNovelItem[];
+}
+
 export class VndbProvider implements GameDataProvider {
   readonly id = "vndb";
   readonly name = "VNDB (Visual Novel Database)";
@@ -34,12 +80,12 @@ export class VndbProvider implements GameDataProvider {
         throw new Error(`VNDB API error: ${response.status}`);
       }
 
-      const data = response.json;
+      const data = response.json as VndbKanaResponse;
       if (!data.results || !Array.isArray(data.results)) {
         return [];
       }
 
-      return data.results.map((item: any) => this.mapVnToMetadata(item));
+      return data.results.map((item: VndbVisualNovelItem) => this.mapVnToMetadata(item));
     } catch (error) {
       console.error("[GameMetadata] VNDB Search error:", error);
       throw error;
@@ -69,7 +115,7 @@ export class VndbProvider implements GameDataProvider {
         throw new Error(`VNDB API error: ${response.status}`);
       }
 
-      const data = response.json;
+      const data = response.json as VndbKanaResponse;
       if (!data.results || data.results.length === 0) {
         throw new Error("Visual novel not found on VNDB.");
       }
@@ -81,14 +127,23 @@ export class VndbProvider implements GameDataProvider {
     }
   }
 
-  private mapVnToMetadata(vn: any): GameMetadata {
+  private mapVnToMetadata(vn: VndbVisualNovelItem): GameMetadata {
     const releaseYear = vn.released ? vn.released.substring(0, 4) : undefined;
-    const developers = vn.developers ? vn.developers.map((d: any) => d.name).filter(Boolean) : [];
-    const originalTitle = vn.alttitle || (vn.titles ? vn.titles.find((t: any) => t.lang === "ja")?.title : undefined);
-    
+    const developers = vn.developers
+      ? vn.developers
+          .map((d) => d.name)
+          .filter((name): name is string => typeof name === "string" && name.length > 0)
+      : [];
+    const originalTitle =
+      vn.alttitle || (vn.titles ? vn.titles.find((t) => t.lang === "ja")?.title : undefined);
+
     const cleanDesc = this.cleanBbCode(vn.description || "");
 
-    const screenshots = vn.screenshots ? vn.screenshots.map((s: any) => s.url).filter(Boolean) : [];
+    const screenshots = vn.screenshots
+      ? vn.screenshots
+          .map((s) => s.url)
+          .filter((url): url is string => typeof url === "string" && url.length > 0)
+      : [];
     const coverUrl = vn.image?.url || (screenshots.length > 0 ? screenshots[0] : undefined);
     const bannerUrl = screenshots.length > 0 ? screenshots[0] : coverUrl;
 
@@ -101,9 +156,13 @@ export class VndbProvider implements GameDataProvider {
     }
 
     const rating10 = vn.rating ? Math.round((vn.rating / 10) * 10) / 10 : undefined;
-    const tags = vn.tags ? vn.tags.map((t: any) => t.name).slice(0, 10).filter(Boolean) : [];
+    const tags = vn.tags
+      ? vn.tags
+          .map((t) => t.name)
+          .filter((name): name is string => typeof name === "string" && name.length > 0)
+          .slice(0, 10)
+      : [];
 
-    // Platforms mapping
     const platformMap: Record<string, string> = {
       win: "PC (Windows)",
       lin: "Linux",
@@ -122,7 +181,9 @@ export class VndbProvider implements GameDataProvider {
       n3d: "Nintendo 3DS",
     };
     const platforms = vn.platforms
-      ? vn.platforms.map((p: string) => platformMap[p] || p.toUpperCase()).filter(Boolean)
+      ? vn.platforms
+          .map((p: string) => platformMap[p] || p.toUpperCase())
+          .filter((plat): plat is string => typeof plat === "string" && plat.length > 0)
       : [];
 
     return {

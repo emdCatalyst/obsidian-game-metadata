@@ -425,7 +425,7 @@ export class CustomEntryModal extends Modal {
       userReview: this.reviewVal || undefined,
       userNotes: this.notesVal || undefined,
       links: links.length > 0 ? links : undefined,
-      rawProvider: "vndb" as any, // fallback
+      rawProvider: "vndb",
     };
 
     await this.fileService.createGameNote(game);

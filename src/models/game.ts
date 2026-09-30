@@ -43,6 +43,7 @@ export interface GameMetadata {
 
   tags?: string[];
   rawProvider?: "rawg" | "steam" | "igdb" | "vndb";
+  customTitle?: string;
 }
 
 export type PlayStatus = "Wishlist" | "Backlog" | "Playing" | "Completed" | "Dropped" | "On Hold";

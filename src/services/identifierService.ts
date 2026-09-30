@@ -39,7 +39,7 @@ export class IdentifierService {
 
     for (const link of links) {
       if (typeof link !== "string") continue;
-      const match = link.match(/rawg\.io\/games\/([a-zA-Z0-9\-]+)/i);
+      const match = link.match(/rawg\.io\/games\/([a-zA-Z0-9-]+)/i);
       if (match) {
         return match[1];
       }
