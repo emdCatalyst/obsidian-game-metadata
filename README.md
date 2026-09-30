@@ -9,8 +9,7 @@
   Dependencies">
 <img src="https://img.shields.io/github/issues/emdCatalyst/obsidian-game-metadata?color=informational"
   alt="GitHub Issues">
-  <img src="https://img.shields.io/github/actions/workflow/status/emdCatalyst/obsidian-game-metadata/build.
-  yml?branch=main" alt="Build Status">
+  <img src="https://img.shields.io/github/actions/workflow/status/emdCatalyst/obsidian-game-metadata/build.yml?branch=main" alt="Build Status">
 </p>
 <p align="center">
 <img src="assets/demo.webp" width="700"/>
