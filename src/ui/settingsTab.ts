@@ -14,11 +14,10 @@ export class GameMetadataSettingTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
-    new Setting(containerEl).setName("Game Metadata Plugin Settings").setHeading();
 
-    // -------------------------------------------------------------
+    
     // Provider & API Keys
-    // -------------------------------------------------------------
+    
     this.addSectionHeader(containerEl, "API & Data Providers");
 
     new Setting(containerEl)
@@ -88,9 +87,9 @@ export class GameMetadataSettingTab extends PluginSettingTab {
         });
       });
 
-    // -------------------------------------------------------------
+    
     // Folder Structure & Subfolder Organization
-    // -------------------------------------------------------------
+    
     this.addSectionHeader(containerEl, "Note Storage & Folder Structure");
 
     new Setting(containerEl)
@@ -192,9 +191,9 @@ export class GameMetadataSettingTab extends PluginSettingTab {
           });
       });
 
-    // -------------------------------------------------------------
+    
     // HowLongToBeat & Playtime Integration
-    // -------------------------------------------------------------
+    
     this.addSectionHeader(containerEl, "HowLongToBeat & Playtime");
 
     new Setting(containerEl)
@@ -221,9 +220,9 @@ export class GameMetadataSettingTab extends PluginSettingTab {
           });
       });
 
-    // -------------------------------------------------------------
+    
     // Banner Plugin Integration
-    // -------------------------------------------------------------
+    
     this.addSectionHeader(containerEl, "Banner Plugin Integration");
 
     new Setting(containerEl)
@@ -280,9 +279,9 @@ export class GameMetadataSettingTab extends PluginSettingTab {
           });
       });
 
-    // -------------------------------------------------------------
+    
     // Dataview & Properties Integration
-    // -------------------------------------------------------------
+    
     this.addSectionHeader(containerEl, "Dataview & Frontmatter Properties");
 
     new Setting(containerEl)
@@ -315,9 +314,9 @@ export class GameMetadataSettingTab extends PluginSettingTab {
           });
       });
 
-    // -------------------------------------------------------------
+    
     // Note Body Template Customizer
-    // -------------------------------------------------------------
+    
     this.addSectionHeader(containerEl, "Custom Note Template");
 
     containerEl.createDiv({
