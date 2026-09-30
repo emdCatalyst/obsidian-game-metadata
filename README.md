@@ -1,5 +1,5 @@
-# obsidian-game-metadata
-  A comprehensive Obsidian plugin to search video game and visual novel databases (**RAWG**, **Steam**, **VNDB**, and **HowLongToBeat**), retrieve rich metadata, cover & banner artwork, completion durations, ratings, and descriptions, for multiple platforms, and embed them into your vault with [Banners](https://community.obsidian.md/plugins/obsidian-banners), [Dataview](https://community.obsidian.md/plugins/dataview), and **Configurable Subfolder Hierarchy** support.
+# Game and Visual Novel Metadata
+  A comprehensive plugin to search video game and visual novel databases (**RAWG**, **Steam**, **VNDB**, and **HowLongToBeat**), retrieve rich metadata, cover & banner artwork, completion durations, ratings, and descriptions, for multiple platforms, and embed them into your vault with [Banners](https://community.obsidian.md/plugins/obsidian-banners), [Dataview](https://community.obsidian.md/plugins/dataview), and **Configurable Subfolder Hierarchy** support.
 
 <p align="center">
 <img src="https://img.shields.io/badge/license-MIT-blue.svg"/>
