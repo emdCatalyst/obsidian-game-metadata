@@ -1,5 +1,5 @@
 # obsidian-game-metadata
-A comprehensive Obsidian plugin to search video game and visual novel databases (**RAWG**, **Steam**, **VNDB**, and **HowLongToBeat**), retrieve rich metadata, cover & banner artwork, completion durations, ratings, and descriptions, for multiple platforms, and embed them into your vault with [Banners](https://community.obsidian.md/plugins/obsidian-banners), [Dataview](https://community.obsidian.md/plugins/dataview), and **Configurable Subfolder Hierarchy** support.
+  A comprehensive Obsidian plugin to search video game and visual novel databases (**RAWG**, **Steam**, **VNDB**, and **HowLongToBeat**), retrieve rich metadata, cover & banner artwork, completion durations, ratings, and descriptions, for multiple platforms, and embed them into your vault with [Banners](https://community.obsidian.md/plugins/obsidian-banners), [Dataview](https://community.obsidian.md/plugins/dataview), and **Configurable Subfolder Hierarchy** support.
 
 <p align="center">
 <img src="https://img.shields.io/badge/license-MIT-blue.svg"/>
@@ -73,14 +73,17 @@ A comprehensive Obsidian plugin to search video game and visual novel databases 
 
 ---
 ## Customization
-- You can freely switch between different data providers (RAWG & Steam). I recommend RAWG because it has games from all platforms, but it needs an API key. You can get yours **for free** [here](https://rawg.io/apidocs). RAWG offers a **very generous** free tier so don't worry about hiting the limits.<br>
-<img src="assets/settings_api.webp" width="500"/>
-- You can manage everything related to the note's creation and placement. That includes the folder, Visual Novel folder seperation, subfolder organization (including a custom pattern) and file name. <br>
-<img src="assets/settings_notes.webp" width="500"/>
-- You can also manage the integration with [Banners](https://community.obsidian.md/plugins/obsidian-banners) and [Dataview](https://community.obsidian.md/plugins/dataview) as you see fit.<br>
-<img src="assets/settings_integration.webp" width="500"/>
-- Finally, you can write your own template for the created note, or stick with the default one, with support of a massive list of variables to choose from.<br>
-<img src="assets/settings_template.webp" width="500"/>
+- You can freely switch between different data providers (RAWG & Steam). I recommend RAWG because it has games from all platforms, but it needs an API key. You can get yours **for free** [here](https://rawg.io/apidocs). RAWG offers a **very generous** free tier so don't worry about hiting the limits.
+> <img src="assets/settings_api.webp" width="500"/>
+
+- You can manage everything related to the note's creation and placement. That includes the folder, Visual Novel folder seperation, subfolder organization (including a custom pattern) and file name. 
+> <img src="assets/settings_notes.webp" width="500"/>
+
+- You can also manage the integration with [Banners](https://community.obsidian.md/plugins/obsidian-banners) and [Dataview](https://community.obsidian.md/plugins/dataview) as you see fit.
+> <img src="assets/settings_integration.webp" width="500"/>
+
+- Finally, you can write your own template for the created note, or stick with the default one, with support of a massive list of variables to choose from.
+> <img src="assets/settings_template.webp" width="500"/>
 
 ---
 
